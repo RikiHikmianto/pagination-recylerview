@@ -1,6 +1,7 @@
 package co.id.rikihikmianto.paginationrecyclerview
 
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -53,28 +54,37 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun getuser(isOnRefresh: Boolean) {
-        isLoading = true
-        if (!isOnRefresh) binding.progressBar.visibility = View.VISIBLE
-        val hashMap = HashMap<String, String>()
-        hashMap["page"] = page.toString()
-        ApiConfig.instance.getUsers(hashMap).enqueue(object : Callback<UserResponse> {
-            override fun onResponse(call: Call<UserResponse>, response: Response<UserResponse>) {
-                totalPage = response.body()?.totalPages!!
-                val listUserResponse = response.body()?.data
-                if (listUserResponse != null) {
-                    adapter.addList(listUserResponse)
+        Handler().postDelayed({
+            isLoading = true
+            if (!isOnRefresh) binding.progressBar.visibility = View.VISIBLE
+            val hashMap = HashMap<String, String>()
+            hashMap["page"] = page.toString()
+            ApiConfig.instance.getUsers(hashMap).enqueue(object : Callback<UserResponse> {
+                override fun onResponse(
+                    call: Call<UserResponse>,
+                    response: Response<UserResponse>
+                ) {
+                    totalPage = response.body()?.totalPages!!
+                    val listUserResponse = response.body()?.data
+                    if (listUserResponse != null) {
+                        adapter.addList(listUserResponse)
+                    }
+                    if (page == totalPage) {
+                        binding.progressBar.visibility = View.GONE
+                    } else {
+                        binding.progressBar.visibility = View.VISIBLE
+                    }
+                    isLoading = false
+                    binding.swipeRefresh.isRefreshing = false
                 }
-                binding.progressBar.visibility = View.GONE
-                isLoading = false
-                binding.swipeRefresh.isRefreshing = false
-            }
 
-            override fun onFailure(call: Call<UserResponse>, t: Throwable) {
-                Toast.makeText(this@MainActivity, t.message, Toast.LENGTH_SHORT).show()
-                Log.d("TAG", "onFailure: ${t.message}")
-            }
+                override fun onFailure(call: Call<UserResponse>, t: Throwable) {
+                    Toast.makeText(this@MainActivity, t.message, Toast.LENGTH_SHORT).show()
+                    Log.d("TAG", "onFailure: ${t.message}")
+                }
 
-        })
+            })
+        }, 3000)
     }
 
     private fun setupRecylerView() {

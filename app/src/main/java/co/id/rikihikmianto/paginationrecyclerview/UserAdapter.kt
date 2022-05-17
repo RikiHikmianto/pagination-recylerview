@@ -9,6 +9,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import java.net.BindException
 
 class UserAdapter(var list: MutableList<DataItem?>?) :
     RecyclerView.Adapter<UserAdapter.Viewholder>() {
@@ -16,12 +17,8 @@ class UserAdapter(var list: MutableList<DataItem?>?) :
 
     inner class Viewholder(binding: ItemUserBinding) : RecyclerView.ViewHolder(binding.root) {
         var image = binding.imvAvatar
-        fun bind(dataItem: DataItem) {
-            with(itemView) {
-                binding?.tvEmail!!.text = dataItem.email
-                binding?.tvName!!.text = dataItem.firstName
-            }
-        }
+        var tvEmail = binding.tvEmail
+        var tvName = binding.tvName
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Viewholder {
@@ -35,9 +32,8 @@ class UserAdapter(var list: MutableList<DataItem?>?) :
     }
 
     override fun onBindViewHolder(holder: Viewholder, position: Int) {
-        list!![position].let {
-            holder.bind(it!!)
-        }
+        holder.tvEmail.text = list!![position]?.email
+        holder.tvName.text = list!![position]?.firstName
         Glide.with(holder.itemView.context).load(list!![position]?.avatar)
             .transform(CenterCrop(), RoundedCorners(25)).diskCacheStrategy(
                 DiskCacheStrategy.ALL
