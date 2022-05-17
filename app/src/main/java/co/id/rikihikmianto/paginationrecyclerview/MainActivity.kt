@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     private fun getuser(isOnRefresh: Boolean) {
-        Handler().postDelayed({
+        Handler().postDelayed({ // delete for this
             isLoading = true
             if (!isOnRefresh) binding.progressBar.visibility = View.VISIBLE
             val hashMap = HashMap<String, String>()
